@@ -258,7 +258,7 @@ class GroupView(viewsets.ModelViewSet):
                     group.user_set.remove(user)
             return Response('Đã xóa danh sách user khỏi nhóm', status=200)
         except Group.DoesNotExist:
-            return Response('Group không tồn tại', status=404)
+            return Response('Nhóm không tồn tại', status=404)
         
 class PermissionView(viewsets.ModelViewSet):
     queryset = Permission.objects.all()
