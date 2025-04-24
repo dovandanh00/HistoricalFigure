@@ -1,0 +1,41 @@
+# Python bytecode
+*.pyc
+*.pyo
+__pycache__/
+
+# vitual environment
+venv_historical/
+.venv_historical/
+env/
+.env/
+
+# config IDEs
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Database (SQLite)
+*.sqlite3
+
+# Sensitive information
+.env
+
+# Backup files
+*~
+*.bak
+*.swp
+
+# Media files
+/media/
+
+# Pipenv
+Pipfile.lock
+
+# Poetry
+pyproject.toml
+poetry.lock
+
+# Conda environment
+environment.yml
