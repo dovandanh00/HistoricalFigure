@@ -243,6 +243,23 @@ class GroupView(viewsets.ModelViewSet):
         except Exception as e:
             return Response(str(e), status=404)
         
+    @action(methods=['delete'], detail=True, url_path='bulk_remove_user')
+    def bulk_remove_user(self, request, pk):
+        user_ids = request.data.get('user_ids')
+        if not user_ids:
+            return Response('Thiếu danh sách user_id', status=400)
+        try:
+            group = Group.objects.get(id=pk)
+            queryset = User.objects.filter(id__in=user_ids)
+            for user in queryset:
+                if user not in group.user_set.all():
+                    pass
+                else:
+                    group.user_set.remove(user)
+            return Response('Đã xóa danh sách user khỏi nhóm', status=200)
+        except Group.DoesNotExist:
+            return Response('Nhóm không tồn tại', status=404)
+        
 class PermissionView(viewsets.ModelViewSet):
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
