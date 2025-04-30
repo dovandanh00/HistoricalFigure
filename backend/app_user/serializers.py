@@ -9,6 +9,7 @@ from backend.custom.functions import check_validate_password
 
 
 class UserSerializer(serializers.ModelSerializer):
+    groups = serializers.SerializerMethodField()
     class Meta: 
         model = User
         fields = ['id', 'username', 'email', 'password', 'last_login', 'first_name', 'last_name', 
@@ -16,6 +17,31 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True},
         }
+
+    def get_groups(self, obj):
+        groups = obj.groups.all()
+        if not groups:
+            return []
+        results = []
+        for group in groups:
+            results.append({
+                'id': group.id,
+                'name': group.name,
+                'permissions': self.get_permissions(group)
+            })
+        return results
+    
+    def get_permissions(self, group):
+        permissions = group.permissions.all()
+        if not permissions:
+            return []
+        results = []
+        for permission in permissions:
+            results.append({
+                'id': permission.id,
+            })
+        return results
+
     def create(self, validated_data): # Hàm này sẽ chạy khi post dữ liệu hợp lệ lên để tạo mới user
         groups = validated_data.pop('groups', [])  # Lấy danh sách nhóm (.pop() giúp lấy dữ liệu và loại bỏ nó khỏi validated_data để tránh lỗi khi tạo User)
         permissions = validated_data.pop('user_permissions', [])  # Lấy danh sách quyền

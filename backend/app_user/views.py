@@ -46,14 +46,17 @@ class UserView(BaseView):
         first_name = self.request.query_params.get('first_name')
         last_name = self.request.query_params.get('last_name')
         group_id = self.request.query_params.get('group_id')
+        group_name = self.request.query_params.get('group_name')
         avatar = self.request.query_params.get('avatar')
         queryset = self.queryset
         if avatar == '0':
-            queryset = queryset.filter(avatar__isnull=False) # Lấy ra các obj có avatar (tức là null=False trong trường avatar)
-        else:
-            queryset = queryset.filter(avatar__isnull=True) # Lấy ra các obj không có avatar (tức là null=True trong trường avatar), vì mặc định là để null=True (có thể bỏ trống)
+            queryset = queryset.filter(avatar__isnull=True) # Lấy ra các obj có avatar (tức là null=False trong trường avatar)
+        elif avatar == '1':
+            queryset = queryset.filter(avatar__isnull=False) # Lấy ra các obj không có avatar (tức là null=True trong trường avatar), vì mặc định là để null=True (có thể bỏ trống)
         if group_id:
             queryset = queryset.filter(groups=group_id)
+        if group_name:
+            queryset = queryset.filter(groups__name__iexact=group_name)
         if first_name:
             queryset = queryset.filter(first_name__icontains=first_name) # Tìm kiếm gần đúng giá trị và không phân biệt hoa thường bằng __icontains (__icontains có thể lúc chạy lúc không chạy do từng db)
         if last_name:
@@ -81,6 +84,19 @@ class UserView(BaseView):
             return [IsSuperuserPermission()]
         else:
             return [permissions.IsAuthenticated(), IsOwnerPermission()]
+        
+    @action(methods=['post'], detail=True, url_path='add_perm')
+    def add_permission(self, request, pk):
+        perm_id = request.data.get('perm_id')
+        if not perm_id:
+            return Response('Thiếu perm_id', status=400)
+        try:
+            user = User.objects.get(id=pk)
+            perm = Permission.objects.get(id=perm_id)
+            user.user_permissions.add(perm)
+            return Response('Đã thêm thành công quyền vào người dùng', status=200)
+        except User.DoesNotExist:
+            return Response('Người dùng không tồn tại', status=404)
         
     @action(methods=['patch'], detail=False, url_path='change_pass')
     def change_password(self, request):
