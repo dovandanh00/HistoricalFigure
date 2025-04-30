@@ -1,4 +1,5 @@
 from django.db import models
+from auditlog.registry import auditlog
 from django.contrib.auth.models import AbstractUser, Permission
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core import validators
@@ -55,4 +56,10 @@ class APIKey(BaseModel):
 
     def key(self):
         return self.id
+    
+fields_to_exclude = [
+        'password',
+        # Thêm các trường khác muốn loại bỏ khỏi log_changes vào đây
+    ]
 
+auditlog.register(User, exclude_fields=fields_to_exclude)

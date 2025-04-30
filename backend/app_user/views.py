@@ -11,7 +11,7 @@ from django.views import View
 
 from rest_framework.exceptions import ValidationError
 
-from django.contrib.admin.models import LogEntry
+from auditlog.models import LogEntry
 
 from oauth2_provider.views.mixins import OAuthLibMixin
 from oauth2_provider.models import AccessToken, RefreshToken
@@ -26,6 +26,7 @@ from .serializers import (UserSerializer, SuperUserSerializer, UserOverviewSeria
 from .models import User, APIKey
 from django.contrib.auth.models import Group
 
+from backend.custom.views import BaseView
 from backend.custom.pagination import CustomPagination
 from backend.custom.permissions import IsOwnerPermission, CustomModelPermissions, IsOwnerObjectPermission, IsSuperuserPermission
 from backend.custom.functions import check_validate_password, get_random_password
@@ -34,7 +35,7 @@ from backend.custom.functions import check_validate_password, get_random_passwor
 # Create your views here.
 
 
-class UserView(viewsets.ModelViewSet):
+class UserView(BaseView):
     queryset = User.objects.all()
     # serializer_class = UserSerializer
     pagination_class = CustomPagination
@@ -45,7 +46,12 @@ class UserView(viewsets.ModelViewSet):
         first_name = self.request.query_params.get('first_name')
         last_name = self.request.query_params.get('last_name')
         group_id = self.request.query_params.get('group_id')
+        avatar = self.request.query_params.get('avatar')
         queryset = self.queryset
+        if avatar == '0':
+            queryset = queryset.filter(avatar__isnull=False) # Lấy ra các obj có avatar (tức là null=False trong trường avatar)
+        else:
+            queryset = queryset.filter(avatar__isnull=True) # Lấy ra các obj không có avatar (tức là null=True trong trường avatar), vì mặc định là để null=True (có thể bỏ trống)
         if group_id:
             queryset = queryset.filter(groups=group_id)
         if first_name:
@@ -100,6 +106,7 @@ class UserView(viewsets.ModelViewSet):
             return Response('Đặt lại mật khẩu thành công', status=200)
         except User.DoesNotExist:
             return Response('Người dùng không tồn tại', status=404)
+        
 
 class CreateSuperUserView(viewsets.ViewSet,
                     generics.CreateAPIView):
@@ -132,7 +139,7 @@ class GroupView(viewsets.ModelViewSet):
             group = Group.objects.get(id=pk)
             perm = Permission.objects.get(id=perm_id)
             group.permissions.add(perm)
-            return Response('Thêm permission vào nhóm thành công', status=200)
+            return Response('Thêm permission vào nhóm thành công', status=200) # hoặc trả ra kiểu return Response(self.get_serializer_class()(obj).data, status=200)
         except Group.DoesNotExist:
             return Response('Group không tồn tại', status=404)
         except Permission.DoesNotExist:

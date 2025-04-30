@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'jazzmin',
     'oauth2_provider',
+    'auditlog',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -78,6 +79,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'auditlog.middleware.AuditlogMiddleware' # Tự động ghi log
 ]
 
 ROOT_URLCONF = 'backend.urls'

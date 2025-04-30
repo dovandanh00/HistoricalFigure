@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import Group, Permission
-from django.contrib.admin.models import LogEntry
+from auditlog.models import LogEntry
 
 import json
 
@@ -23,6 +23,25 @@ class UserSerializer(serializers.ModelSerializer):
         user.groups.set(groups)  # Sử dụng .set() để gán nhóm
         user.user_permissions.set(permissions)  # Dùng .set() để gán quyền
         return user
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        id = self.context.get('request').query_params.get('id')
+        fields = self.context.get('request').query_params.get('fields')
+
+        if fields: # Chỉ trả ra những trường mà truyền vào params
+            fields_list = [item.strip() for item in fields.split(',')]
+            for i in list(data.keys()):
+                if i not in fields_list:
+                    del data[i]
+
+        if id == '0': # Ẩn hiện fields khi có điều kiện nào đó (vd: ẩn hiện fields 'id' khi truyền vào id = 0)
+            del data['id']
+
+        # if not data['avatar']:
+        #     data['avatar'] = 'link...' # Sửa dữ liệu json trả ra (tính năng của hàm to_representation())
+
+        return data
     
 class SuperUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -49,6 +68,26 @@ class UserOverviewSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True},
         }
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        id = self.context.get('request').query_params.get('id')
+        fields = self.context.get('request').query_params.get('fields')
+
+        if id == '0':
+            del data['id']
+
+        if fields:
+            fields_list = [item.strip() for item in fields.split(',')]
+            for i in list(data.keys()):
+                if i not in fields_list:
+                    del data[i]
+        
+        # if not data['avatar']:
+        #     data['avatar'] = 'link...'
+
+        return data
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_pass = serializers.CharField(required=True)
@@ -102,55 +141,56 @@ class APIKeySerializer(serializers.ModelSerializer):
         return obj.id
     
 class LogEntrySerializer(serializers.ModelSerializer):
-    action_flag = serializers.SerializerMethodField()
-    user = serializers.SerializerMethodField()
-    content_type = serializers.SerializerMethodField()
-    change_message = serializers.SerializerMethodField()
+    # action_flag = serializers.SerializerMethodField()
+    # user = serializers.SerializerMethodField()
+    # content_type = serializers.SerializerMethodField()
+    # change_message = serializers.SerializerMethodField()
 
     class Meta:
         model = LogEntry
-        fields = ['id', 'action_time', 'object_id', 'object_repr', 
-                  'action_flag', 'change_message', 'user', 'content_type']
+        # fields = ['id', 'action_time', 'object_id', 'object_repr', 
+        #           'action_flag', 'change_message', 'user', 'content_type']
+        fields = '__all__'
         
-    def get_action_flag(self, obj):
-        if obj.action_flag == 1:
-            return 'Thêm'
-        elif obj.action_flag == 2:
-            return 'Thay đổi'
-        else:
-            return 'Xóa'
+    # def get_action_flag(self, obj):
+    #     if obj.action_flag == 1:
+    #         return 'Thêm'
+    #     elif obj.action_flag == 2:
+    #         return 'Thay đổi'
+    #     else:
+    #         return 'Xóa'
         
-    def get_user(self, obj):
-        if not obj.user:
-            return None
-        return {
-            'id': obj.user.id,
-            'username': obj.user.username,
-        }
+    # def get_user(self, obj):
+    #     if not obj.user:
+    #         return None
+    #     return {
+    #         'id': obj.user.id,
+    #         'username': obj.user.username,
+    #     }
     
-    def get_content_type(self, obj):
-        if not obj.content_type:
-            return None
-        return {
-            'id': str(obj.content_type.id),
-            'app_label': obj.content_type.app_label,
-            'model': obj.content_type.model,
-        } 
+    # def get_content_type(self, obj):
+    #     if not obj.content_type:
+    #         return None
+    #     return {
+    #         'id': str(obj.content_type.id),
+    #         'app_label': obj.content_type.app_label,
+    #         'model': obj.content_type.model,
+    #     } 
     
-    def get_change_message(self, obj):
-        try:
-            messages = json.loads(obj.change_message) # Chuyển Json str thành python dict
-        except Exception:
-            return obj.change_message # Nếu change_message ko phải Json str thì trả về chuỗi ban đầu
-        results = []
-        for message in messages:
-            if 'added' in message:
-                name = message['added'].get('name', '') # Lấy name trong added
-                results.append(f'Đã thêm: {name}')
-            elif 'changed' in message:
-                fields = message['changed'].get('fields', [])
-                results.append(f'Đã thay đổi các trường: {fields}')
-            elif 'deleted' in message:
-                name = message['deleted'].get('name', '')
-                results.append(f'Đã xóa: {name}')
-        return results if results else None
+    # def get_change_message(self, obj):
+    #     try:
+    #         messages = json.loads(obj.change_message) # Chuyển Json str thành python dict
+    #     except Exception:
+    #         return obj.change_message # Nếu change_message ko phải Json str thì trả về chuỗi ban đầu
+    #     results = []
+    #     for message in messages:
+    #         if 'added' in message:
+    #             name = message['added'].get('name', '') # Lấy name trong added
+    #             results.append(f'Đã thêm: {name}')
+    #         elif 'changed' in message:
+    #             fields = message['changed'].get('fields', [])
+    #             results.append(f'Đã thay đổi các trường: {fields}')
+    #         elif 'deleted' in message:
+    #             name = message['deleted'].get('name', '')
+    #             results.append(f'Đã xóa: {name}')
+    #     return results if results else None

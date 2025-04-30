@@ -2,8 +2,6 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.safestring import mark_safe
 
-from django.contrib.admin.models import LogEntry
-
 from .models import User, APIKey
 from backend.custom.admin import BaseAdmin
 
@@ -49,4 +47,3 @@ class APIKeyAdmin(BaseAdmin):
 
 admin.site.register(User, UserCustomAdmin)
 admin.site.register(APIKey, APIKeyAdmin)
-admin.site.register(LogEntry)
