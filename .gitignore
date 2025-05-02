@@ -28,7 +28,7 @@ env/
 *.swp
 
 # Media files
-media/
+/media/
 
 # Pipenv
 Pipfile.lock
