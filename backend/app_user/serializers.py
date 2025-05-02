@@ -10,6 +10,7 @@ from backend.custom.functions import check_validate_password
 
 class UserSerializer(serializers.ModelSerializer):
     groups = serializers.SerializerMethodField()
+    user_permissions = serializers.SerializerMethodField()
     class Meta: 
         model = User
         fields = ['id', 'username', 'email', 'password', 'last_login', 'first_name', 'last_name', 
@@ -39,6 +40,18 @@ class UserSerializer(serializers.ModelSerializer):
         for permission in permissions:
             results.append({
                 'id': permission.id,
+            })
+        return results
+    
+    def get_user_permissions(self, obj):
+        user_permissions = obj.user_permissions.all()
+        if not user_permissions:
+            return []
+        results = []
+        for user_permission in user_permissions:
+            results.append({
+                'id': user_permission.id,
+                'name': user_permission.name,
             })
         return results
 

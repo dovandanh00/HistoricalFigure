@@ -28,11 +28,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-0pt@azv)4uzbkd)iic*$m5+th)3mzo1=^y#+2ha93lc_0hxdf@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# Cái này nếu chạy thật thì chuyển DEBUG = False để tránh trường hợp bị hacker xâm nhập (còn test 1 mình thì ko cần chuyển thành False)
 DEBUG = True
 
 # Cái này là biến môi trường có thể cho vào .env (Là danh sách các domain/IP được phép truy cập vào website khi DEBUG = False, Django dùng nó để chặn request từ các nguồn không đáng tin cậy)
 # VD: ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
