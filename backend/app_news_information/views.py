@@ -7,11 +7,12 @@ from .models import NewsTopic, NewsArticle
 from .serializers import NewsTopicSerializer, NewsTopicOverviewSerializer, NewsArticleSerializer, NewsArticleOverviewSerializer
 
 from backend.custom.pagination import CustomPagination
+from backend.custom.views import BaseView
 from backend.custom.permissions import CustomModelPermissions, IsOwnerPermission, IsOwnerObjectPermission, IsSuperuserPermission
 
 # Create your views here.
 
-class NewsTopicView(viewsets.ModelViewSet):
+class NewsTopicView(BaseView):
     queryset = NewsTopic.objects.all()
     # serializer_class = NewsTopicSerializer
     pagination_class = CustomPagination
@@ -33,7 +34,7 @@ class NewsTopicView(viewsets.ModelViewSet):
         else:
             return NewsTopicSerializer
 
-class NewsArticleView(viewsets.ModelViewSet):
+class NewsArticleView(BaseView):
     queryset = NewsArticle.objects.all()
     # serializer_class = NewsArticleSerializer
     pagination_class = CustomPagination

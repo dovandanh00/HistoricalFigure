@@ -57,5 +57,5 @@ class SpecialModelPermissions(BasePermission): # Kiểm tra quyền đặc biệ
         super().__init__()
 
     def has_permission(self, request, view):
-        app_name = view.queryset.model._meta.app_label
-        return request.user.is_superuser or request.user.has_perm(f'{app_name}.{self.perm}')
+        app_name = view.queryset.model._meta.app_label # Lấy ra tên app của model hiện tại
+        return request.user.is_superuser or request.user.has_perm(f'{app_name}.{self.perm}') # Giống như này request.user.has_perm('app_historical_figures.can_approve_historical_figure'):

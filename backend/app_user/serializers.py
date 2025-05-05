@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
         }
 
-    def get_groups(self, obj):
+    def get_groups(self, obj): # self chính là bản thân đối tượng của class đó (có thể dùng self để gọi các hàm hoặc các biến trong class đó, vd: self.get_permissions()), obj chính là đối tượng trong model mà class đó tham chiếu đến (dùng để lấy ra các trường của đối tượng trong model đó, vd: obj.avatar)
         groups = obj.groups.all()
         if not groups:
             return []

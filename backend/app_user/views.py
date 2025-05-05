@@ -290,7 +290,7 @@ class PermissionView(viewsets.ModelViewSet):
     # authentication_classes = [OAuth2Authentication]
     permission_classes = [permissions.IsAuthenticated, IsSuperuserPermission]
 
-class APIKeyView(viewsets.ModelViewSet):
+class APIKeyView(BaseView):
     queryset = APIKey.objects.all()
     serializer_class = APIKeySerializer
     pagination_class = CustomPagination
@@ -390,6 +390,7 @@ class TokenView(OAuthLibMixin, APIView):
 
         _, _, body, status = self.create_token_response(request._request) # Tạo token dựa vào request thêm vào ở bên trên, hàm create_token_response() sẽ trả về 4 giá trị header, response, body, status
         body = json.loads(body) # Chuyển dữ liệu về dạng dict trước khi gửi về client vì hàm create_token_response() sẽ trả về body dạng chuỗi JSON (str)
+        # body['group'] = user.group.id if user.group else None # custom trả ra thêm group nếu api yêu cầu
 
         if status == 200:
             user.last_login = timezone.now()

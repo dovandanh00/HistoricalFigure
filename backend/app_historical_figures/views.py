@@ -121,7 +121,7 @@ class HistoricalFigureView(BaseView):
                 historical_figure.save()
         return Response('Danh sách danh nhân lịch sử đã bỏ phê duyệt', status=200)
 
-class ImageFolderView(viewsets.ModelViewSet):
+class ImageFolderView(BaseView):
     queryset = ImageFolder.objects.all()
     # serializer_class = ImageFolderSerializer
     pagination_class = CustomPagination
@@ -146,7 +146,7 @@ class ImageFolderView(viewsets.ModelViewSet):
         else:
             return ImageFolderSerializer
         
-class HistoricalImageView(viewsets.ModelViewSet):
+class HistoricalImageView(BaseView):
     queryset = HistoricalImage.objects.all()
     # serializer_class = HistoricalImageSerializer
     pagination_class = CustomPagination
@@ -171,7 +171,7 @@ class HistoricalImageView(viewsets.ModelViewSet):
         else:
             return HistoricalImageSerializer
         
-class HistoricalFilmView(viewsets.ModelViewSet):
+class HistoricalFilmView(BaseView):
     queryset = HistoricalFilm.objects.filter(is_approve=True)
     # serializer_class = HistoricalFilmSerializer
     pagination_class = CustomPagination
@@ -265,7 +265,7 @@ class HistoricalFilmView(viewsets.ModelViewSet):
                 historical_film.save()
         return Response('Danh sách phim tư liệu đã bỏ phê duyệt', status=200)
         
-class HistoricalDocumentView(viewsets.ModelViewSet):
+class HistoricalDocumentView(BaseView):
     queryset = HistoricalDocument.objects.all()
     # serializer_class = HistoricalDocumentSerializer
     pagination_class = CustomPagination

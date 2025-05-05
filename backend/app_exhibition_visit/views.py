@@ -7,11 +7,12 @@ from .models import ExhibitionArea, ExhibitionContent, Artifact
 from .serializers import ExhibitionAreaSerializer, ExhibitionAreaOverviewSerializer, ExhibitionContentSerializer, ExhibitionContentOverviewSerializer, ArtifactSerializer
 
 from backend.custom.pagination import CustomPagination
+from backend.custom.views import BaseView
 from backend.custom.permissions import CustomModelPermissions, IsOwnerPermission, IsOwnerObjectPermission, IsSuperuserPermission
 
 # Create your views here.
 
-class ExhibitionAreaView(viewsets.ModelViewSet):
+class ExhibitionAreaView(BaseView):
     queryset = ExhibitionArea.objects.all()
     # serializer_class = ExhibitionAreaSerializer
     pagination_class = CustomPagination
@@ -36,7 +37,7 @@ class ExhibitionAreaView(viewsets.ModelViewSet):
         else:
             return ExhibitionAreaSerializer
 
-class ExhibitionContentView(viewsets.ModelViewSet):
+class ExhibitionContentView(BaseView):
     queryset = ExhibitionContent.objects.all()
     # serializer_class = ExhibitionContentSerializer
     pagination_class = CustomPagination
@@ -61,7 +62,7 @@ class ExhibitionContentView(viewsets.ModelViewSet):
         else:
             return ExhibitionContentSerializer
 
-class ArtifactView(viewsets.ModelViewSet):
+class ArtifactView(BaseView):
     queryset = Artifact.objects.all()
     serializer_class = ArtifactSerializer
     pagination_class = CustomPagination

@@ -54,5 +54,12 @@ def get_random_password(length=10): # Tạo mật khẩu ngẫu nhiên (quy đ�
 
 def upload_to(instance, filename):
     ext = filename.split('.')[-1]
-    result = os.path.join(instance._meta.app_label, instance.__class__.__name__, timezone.datetime.today().strftime("%Y/%m/%d"), f'{str(uuid.uuid4())}.{ext}')
-    return result
+    result = os.path.join(instance._meta.app_label, instance.__class__.__name__, timezone.now().strftime("%Y/%m/%d"), f'{str(uuid.uuid4())}.{ext}')
+    return result # Có thể đổi đoạn instance.__class__.__name__ thành instance._meta.model_name cũng được
+                  # instance.__class__.__name__ sẽ hiển thị chữ như tên model đã đặt "HistoricalFigure" (PascalCase)
+                  # instance._meta.model_name sẽ hiển thị chữ dạng thường "historicalfigure" (snake_case)
+
+                  # os.path.join('app_name', 'model_name',...) Dùng để nối các thành phần đường dẫn (path) lại với nhau một cách an toàn và đúng kiểu hệ điều hành
+                  # vd: app_name\model_name; linux/mac thì là dấu /, còn windows thì là dấu \
+
+                  # timezone.now().strftime("%Y/%m/%d"): lấy năm tháng ngày giờ hiện tại (theo Django) rồi dùng strftime("%Y/%m/%d") để format thành chuỗi dạng năm/tháng/ngày
